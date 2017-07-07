@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="59px" height="59px" viewBox="0 0 59 59" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M12.5989583,21.7368421 C15.5867113,21.7368421 17.9805134,19.3095614 17.9805134,16.3026316 L17.9985119,5.43421053 C17.9985119,2.4272807 15.5867113,0 12.5989583,0 C9.61120536,0 7.19940476,2.4272807 7.19940476,5.43421053 L7.19940476,16.3026316 C7.19940476,19.3095614 9.61120536,21.7368421 12.5989583,21.7368421 L12.5989583,21.7368421 Z M22.1381696,16.3026316 C22.1381696,21.7368421 17.5665476,25.5407895 12.5989583,25.5407895 C7.63136905,25.5407895 3.05974702,21.7368421 3.05974702,16.3026316 L0,16.3026316 C0,22.4795175 4.89559524,27.5876754 10.7991071,28.4752632 L10.7991071,34.4166667 L14.3988095,34.4166667 L14.3988095,28.4752632 C20.3023214,27.6057895 25.1979167,22.4976316 25.1979167,16.3026316 L22.1381696,16.3026316 L22.1381696,16.3026316 Z" id="path-1"></path>
+    </defs>
+    <g id="Grid" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Sales_voicebot_unbranded" transform="translate(-611.000000, -770.000000)">
+            <g id="Group-3" transform="translate(366.000000, 16.000000)">
+                <g id="Group" transform="translate(245.000000, 754.000000)">
+                    <circle id="Oval-Copy" fill="#3498DB" cx="29.5" cy="29.5" r="29.5"></circle>
+                    <g id="Symbol-Copy" transform="translate(17.208333, 12.291667)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <use id="Shape" fill="#FFFFFF" xlink:href="#path-1"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
