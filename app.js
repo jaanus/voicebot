@@ -58,132 +58,110 @@ function addError(text) {
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
+  // test for relevant API-s
+  // for (let api of ['speechSynthesis', 'webkitSpeechSynthesis', 'speechRecognition', 'webkitSpeechRecognition']) {
+  //   console.log('api ' + api + " and if browser has it: " + (api in window));
+  // }
+
   displayCurrentTime();
 
   // check for Chrome
   if (!isChrome()) {
     addError("This demo only works in Google Chrome.");
-    console.log("not chrome");
     return;
   }
+
+  if (!('speechSynthesis' in window)) {
+    addError("Your browser doesn’t support speech synthesis. This demo won’t work.");
+    return;
+  }
+
+  if (!('webkitSpeechRecognition' in window)) {
+    addError("Your browser cannot record voice. This demo won’t work.");
+    return;
+  }
+
+  // Now we’ve established that the browser is Chrome with proper speech API-s.
 
   // api.ai client
   const apiClient = new ApiAi.ApiAiClient({accessToken: '329dcb8e2a8f4876acbf7fb616978686'});
 
-  if ('speechSynthesis' in window) {
-    // console.log("can talk");
+  // Initial feedback message.
+  addBotItem("Hi! I’m voicebot. Tap the microphone and start talking to me.");
 
-    // var msg = new SpeechSynthesisUtterance("Hello. Say something.");
-    // msg.addEventListener("end", function(ev) {
-    //   console.log("speech ended");
-    // });
-    // window.speechSynthesis.speak(msg);
+  var recognition = new webkitSpeechRecognition();
+  var recognizedText = null;
+  recognition.continuous = false;
+  recognition.onstart = function() {
+    recognizedText = null;
+  };
+  recognition.onresult = function(ev) {
+    recognizedText = ev["results"][0][0]["transcript"];
 
-    // Synthesis support. Make your web apps talk!
-  } else {
-    addError("Your browser cannot synthesize speech. This demo probably won’t work well.");
-    console.log("cannot talk");
-  }
+    addUserItem(recognizedText);
 
-  if ('webkitSpeechRecognition' in window) {
-    console.log("can listen");
-    // Speech recognition support. Talk to your apps!
+    let promise = apiClient.textRequest(recognizedText);
 
-    // looks like good to go. add the initial feedback message.
-    addBotItem("Hi! I’m voicebot. Tap the microphone and start talking to me.");
+    promise
+        .then(handleResponse)
+        .catch(handleError);
 
-    var recognition = new webkitSpeechRecognition();
-    var recognizedText = null;
-    recognition.continuous = false;
-    recognition.onstart = function() {
-      console.log("recognition start");
-      recognizedText = null;
-    };
-    recognition.onresult = function(ev) {
-      recognizedText = ev["results"][0][0]["transcript"];
+    function handleResponse(serverResponse) {
 
-      // console.log("recognition result", ev);
-      console.log("clean result", recognizedText);
-      addUserItem(recognizedText);
+      // Set a timer just in case. so if there was an error speaking or whatever, there will at least be a prompt to continue
+      var timer = window.setTimeout(function() { startListening(); }, 5000);
 
-      let promise = apiClient.textRequest(recognizedText);
+      const speech = serverResponse["result"]["fulfillment"]["speech"];
+      var msg = new SpeechSynthesisUtterance(speech);
+      addBotItem(speech);
+      msg.addEventListener("end", function(ev) {
+        window.clearTimeout(timer);
+        startListening();
+      });
+      msg.addEventListener("error", function(ev) {
+        window.clearTimeout(timer);
+        startListening();
+      });
 
-      promise
-          .then(handleResponse)
-          .catch(handleError);
-
-      function handleResponse(serverResponse) {
-
-              // set a timer just in case. so if there was an error speaking or whatever, there will at least be a prompt to continue
-              var timer = window.setTimeout(function() { startListening(); }, 5000);
-
-              console.log(serverResponse);
-              const speech = serverResponse["result"]["fulfillment"]["speech"];
-              console.log("response", speech);
-              var msg = new SpeechSynthesisUtterance(speech);
-              addBotItem(speech);
-              msg.addEventListener("end", function(ev) {
-                console.log("speaking the response ended");
-                window.clearTimeout(timer);
-                startListening();
-              });
-              msg.addEventListener("error", function(ev) {
-                window.clearTimeout(timer);
-                startListening();
-                console.log("error speaking", ev);
-              });
-
-              window.speechSynthesis.speak(msg);
-      }
-      function handleError(serverError) {
-              console.log(serverError);
-      }
-
-    };
-    recognition.onerror = function(ev) {
-      console.log("recognition error", ev);
-    };
-    recognition.onend = function() {
-      gotoReadyState();
-      console.log("recognition end");
-      if (!recognizedText) {
-        console.log("did not receive any text. should let user continue conversation.");
-        gotoReadyState();
-      }
-    };
-
-    function startListening() {
-      console.log("starting to listen");
-      gotoListeningState();
-      recognition.start();
+      window.speechSynthesis.speak(msg);
     }
+    function handleError(serverError) {
+      console.log("Error from api.ai server: ", serverError);
+    }
+  };
 
-    const startButton = document.querySelector("#start");
-    startButton.addEventListener("click", function(ev) {
-      console.log("klikk");
-      startListening();
-      ev.preventDefault();
-    });
+  recognition.onerror = function(ev) {
+    console.log("Speech recognition error", ev);
+  };
+  recognition.onend = function() {
+    gotoReadyState();
+  };
 
-    // Esc key handler - cancel listening if pressed
-    // http://stackoverflow.com/questions/3369593/how-to-detect-escape-key-press-with-javascript-or-jquery
-    document.addEventListener("keydown", function(evt) {
-      evt = evt || window.event;
-      var isEscape = false;
-      if ("key" in evt) {
-          isEscape = (evt.key == "Escape" || evt.key == "Esc");
-      } else {
-          isEscape = (evt.keyCode == 27);
-      }
-      if (isEscape) {
-          recognition.abort();
-      }
-    });
-
-
-  } else {
-    addError("Your browser cannot record voice. This demo won’t work.");
-    console.log("cannot listen");
+  function startListening() {
+    gotoListeningState();
+    recognition.start();
   }
+
+  const startButton = document.querySelector("#start");
+  startButton.addEventListener("click", function(ev) {
+    startListening();
+    ev.preventDefault();
+  });
+
+  // Esc key handler - cancel listening if pressed
+  // http://stackoverflow.com/questions/3369593/how-to-detect-escape-key-press-with-javascript-or-jquery
+  document.addEventListener("keydown", function(evt) {
+    evt = evt || window.event;
+    var isEscape = false;
+    if ("key" in evt) {
+        isEscape = (evt.key == "Escape" || evt.key == "Esc");
+    } else {
+        isEscape = (evt.keyCode == 27);
+    }
+    if (isEscape) {
+        recognition.abort();
+    }
+  });
+
 
 });
