@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     recognizedText = ev["results"][0][0]["transcript"];
 
     addUserItem(recognizedText);
+    ga('send', 'event', 'Message', 'add', 'user');
 
     let promise = apiClient.textRequest(recognizedText);
 
@@ -114,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       const speech = serverResponse["result"]["fulfillment"]["speech"];
       var msg = new SpeechSynthesisUtterance(speech);
       addBotItem(speech);
+      ga('send', 'event', 'Message', 'add', 'bot');
       msg.addEventListener("end", function(ev) {
         window.clearTimeout(timer);
         startListening();
@@ -144,6 +146,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   const startButton = document.querySelector("#start");
   startButton.addEventListener("click", function(ev) {
+    ga('send', 'event', 'Button', 'click');
     startListening();
     ev.preventDefault();
   });
