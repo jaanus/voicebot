@@ -16,4 +16,4 @@ Due to browser voice API microphone security/permission requirements, it’s bes
 
 ## Discussion
 
-(link to blogpost coming up)
+Blog post: [How to build a simple web-based voice bot with api.ai](https://jaanus.com/api-ai-voicebot)
