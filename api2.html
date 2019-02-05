@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Voicebot api test</title>
+    <link rel="icon" href="i/favicon.png" type="image/x-icon" />
+
+<script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+<script type="text/javascript">
+
+/*
+
+urls:
+https://cloud.google.com/dialogflow-enterprise/docs/reference/rest/v2/projects.agent.sessions/detectIntent
+https://developers.google.com/identity/protocols/OAuth2UserAgent
+https://console.cloud.google.com/apis/credentials?project=jaanusbot-v2
+
+*/
+
+var GoogleAuth;
+var SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
+
+document.addEventListener("DOMContentLoaded", function(event) {
+  console.log("loaded");
+
+  // init client begin
+
+  gapi.load('client:auth2', function() {
+    gapi.client.init({
+      'apiKey': 'AIzaSyDb7zyMT5m3SYnXAGpK6ni4Jryfzhcp5OU',
+      'clientId': '150540862694-engp2c2vvd23c6mbeot0ivg8k15utr87.apps.googleusercontent.com',
+      'scope': SCOPE
+    }).then(function() {
+      GoogleAuth = gapi.auth2.getAuthInstance();
+      // Listen for sign-in state changes.
+      GoogleAuth.isSignedIn.listen(updateSigninStatus);
+
+      // Handle initial sign-in state. (Determine if user is already signed in.)
+      var user = GoogleAuth.currentUser.get();
+      setSigninStatus();
+
+    });
+  });
+
+  // init client end
+
+  document.querySelector("#sign-in-or-out-button").addEventListener("click", handleAuthClick);
+  document.querySelector("#revoke-access-button").addEventListener("click", revokeAccess);
+
+  function handleAuthClick() {
+    if (GoogleAuth.isSignedIn.get()) {
+      // User is authorized and has clicked 'Sign out' button.
+      console.log("signed in. signing out now.");
+      GoogleAuth.signOut();
+    } else {
+      // User is not signed in. Start Google auth flow.
+      console.log("not signed in. signing in.");
+      GoogleAuth.signIn();
+    }
+  }
+
+  function revokeAccess() {
+    GoogleAuth.disconnect();
+  }
+
+  function setSigninStatus(isSignedIn) {
+    var user = GoogleAuth.currentUser.get();
+    var isAuthorized = user.hasGrantedScopes(SCOPE);
+    if (isAuthorized) {
+      console.log("user authorized, updating UI to reflect that");
+      document.querySelector('#sign-in-or-out-button').innerHTML = 'Sign out';
+      document.querySelector('#revoke-access-button').style.display = 'inline-block';
+      document.querySelector('#auth-status').innerHTML = ('You are currently signed in and have granted access to this app.');
+    } else {
+      console.log("user not authorized, updating UI to reflect that");
+      document.querySelector('#sign-in-or-out-button').innerHTML = ('Sign In/Authorize');
+      document.querySelector('#revoke-access-button').style.display = 'none';
+      document.querySelector('#auth-status').innerHTML = ('You have not authorized this app or you are signed out.');
+    }
+  }
+
+  function updateSigninStatus(isSignedIn) {
+    setSigninStatus();
+  }
+
+});
+</script>
+    <meta name="viewport" content="width=device-width" />
+  </head>
+<body>
+  <p class="main">wat.</p>
+
+  <button id="sign-in-or-out-button">Sign In/Authorize</button>
+  <button id="revoke-access-button" style="display: none">Revoke access</button>
+  <div id="auth-status" style="display: inline"></div>
+
+</body>
+</html>
