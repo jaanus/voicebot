@@ -18,7 +18,7 @@ https://console.cloud.google.com/apis/credentials?project=jaanusbot-v2
 */
 
 var GoogleAuth;
-var SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
+var SCOPE = 'https://www.googleapis.com/auth/dialogflow';
 
 document.addEventListener("DOMContentLoaded", function(event) {
   console.log("loaded");
@@ -46,6 +46,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   document.querySelector("#sign-in-or-out-button").addEventListener("click", handleAuthClick);
   document.querySelector("#revoke-access-button").addEventListener("click", revokeAccess);
+  document.querySelector("#perform-request-button").addEventListener("click", function(ev) {
+    console.log("clicked request button");
+
+    gapi.client.request({
+      path: 'https://dialogflow.googleapis.com/v2/projects/jaanusbot-v2/agent/sessions/deadbeef:detectIntent',
+      method: "POST",
+      body: {
+        "queryInput": {
+          "text": {
+            "text": "why did the chicken cross the road",
+            "languageCode": "en"
+          }
+        }
+      }
+    }).then(function(response) {
+      console.log("onFulfilled", response);
+    }, function(error) {
+      console.log("onRejected", error);
+    });
+
+  });
 
   function handleAuthClick() {
     if (GoogleAuth.isSignedIn.get()) {
@@ -70,11 +91,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
       console.log("user authorized, updating UI to reflect that");
       document.querySelector('#sign-in-or-out-button').innerHTML = 'Sign out';
       document.querySelector('#revoke-access-button').style.display = 'inline-block';
+      document.querySelector('#perform-request-button').style.display = 'inline-block';
       document.querySelector('#auth-status').innerHTML = ('You are currently signed in and have granted access to this app.');
     } else {
       console.log("user not authorized, updating UI to reflect that");
       document.querySelector('#sign-in-or-out-button').innerHTML = ('Sign In/Authorize');
       document.querySelector('#revoke-access-button').style.display = 'none';
+      document.querySelector('#perform-request-button').style.display = 'none';
       document.querySelector('#auth-status').innerHTML = ('You have not authorized this app or you are signed out.');
     }
   }
@@ -92,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   <button id="sign-in-or-out-button">Sign In/Authorize</button>
   <button id="revoke-access-button" style="display: none">Revoke access</button>
+  <button id="perform-request-button" style="display: none">Perform Dialogflow request</button>
   <div id="auth-status" style="display: inline"></div>
 
 </body>
