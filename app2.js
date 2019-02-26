@@ -58,6 +58,26 @@ function addError(text) {
 
 document.addEventListener("DOMContentLoaded", function(event) {
 
+  var GoogleAuth;
+  var SCOPE = 'https://www.googleapis.com/auth/dialogflow';
+
+  gapi.load('client:auth2', function() {
+    gapi.client.init({
+      'apiKey': 'AIzaSyDb7zyMT5m3SYnXAGpK6ni4Jryfzhcp5OU',
+      'clientId': '150540862694-engp2c2vvd23c6mbeot0ivg8k15utr87.apps.googleusercontent.com',
+      'scope': SCOPE
+    }).then(function() {
+      GoogleAuth = gapi.auth2.getAuthInstance();
+      // Listen for sign-in state changes.
+      GoogleAuth.isSignedIn.listen(updateSigninStatus);
+
+      // Handle initial sign-in state. (Determine if user is already signed in.)
+      var user = GoogleAuth.currentUser.get();
+      setSigninStatus();
+
+    });
+  });
+
   // test for relevant API-s
   // for (let api of ['speechSynthesis', 'webkitSpeechSynthesis', 'speechRecognition', 'webkitSpeechRecognition']) {
   //   console.log('api ' + api + " and if browser has it: " + (api in window));
@@ -83,6 +103,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   // Now we’ve established that the browser is Chrome with proper speech API-s.
 
+  /*
   // api.ai client
   const apiClient = new ApiAi.ApiAiClient({accessToken: '329dcb8e2a8f4876acbf7fb616978686'});
 
@@ -165,6 +186,43 @@ document.addEventListener("DOMContentLoaded", function(event) {
         recognition.abort();
     }
   });
+  */
+
+  // Google Authentication
+
+  document.querySelector(".sign-in-or-out-link").addEventListener("click", handleAuthClick);
+
+  function setSigninStatus(isSignedIn) {
+    var user = GoogleAuth.currentUser.get();
+    var isAuthorized = user.hasGrantedScopes(SCOPE);
+    if (isAuthorized) {
+      console.log("User signed in. Updating UI to reflect that");
+      var email = user.getBasicProfile().getEmail();
+
+      document.querySelector(".sign-in-or-out-label").innerHTML = 'Signed in as ' + email + ".";
+      document.querySelector(".sign-in-or-out-link").innerHTML = 'Sign out';
+      document.querySelector(".app-footer").classList.remove("not-signed-in");
+    } else {
+      console.log("User not signed in. Updating UI to reflect that.");
+      document.querySelector(".sign-in-or-out-label").innerHTML = 'Not signed in.';
+      document.querySelector(".sign-in-or-out-link").innerHTML = 'Sign in';
+      document.querySelector(".app-footer").classList.add("not-signed-in");
+    }
+  }
+
+  function updateSigninStatus(isSignedIn) {
+    setSigninStatus();
+  }
+
+  function handleAuthClick() {
+    if (GoogleAuth.isSignedIn.get()) {
+      // User is authorized and has clicked 'Sign out' button.
+      GoogleAuth.signOut();
+    } else {
+      // User is not signed in. Start Google auth flow.
+      GoogleAuth.signIn();
+    }
+  }
 
 
 });

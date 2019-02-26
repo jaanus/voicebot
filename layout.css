@@ -110,6 +110,20 @@ html {
   background-color: #ffffff;
 }
 
+.app-footer .sign-in-or-out {
+  position: relative;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 16px;
+  width: 160px;
+  font-size: 12px;
+  left: 0px;
+  top: -80px;
+}
+
 .app-footer-inner {
   border-top: 1px solid #E0E4E7;
   margin-left: 16px;
@@ -137,6 +151,14 @@ html {
 
 .app-footer-inner img:active {
   opacity:0.5;
+}
+
+.app-footer.not-signed-in .mic {
+  display: none;
+}
+
+.app-footer.not-signed-in .sign-in-or-out {
+  top: 16px;
 }
 
 .mic .listening {
