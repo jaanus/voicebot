@@ -226,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       document.querySelector(".app-footer").classList.remove("not-signed-in");
     } else {
       console.log("User not signed in. Updating UI to reflect that.");
-      document.querySelector(".sign-in-or-out-label").innerHTML = 'Not signed in.';
+      document.querySelector(".sign-in-or-out-label").innerHTML = 'Not signed in. You must sign in with Google to continue.';
       document.querySelector(".sign-in-or-out-link").innerHTML = 'Sign in';
       document.querySelector(".app-footer").classList.add("not-signed-in");
     }

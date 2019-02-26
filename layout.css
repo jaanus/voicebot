@@ -159,6 +159,10 @@ html {
 
 .app-footer.not-signed-in .sign-in-or-out {
   top: 16px;
+  width: 100%;
+  font-size: 16px;
+  line-height: 24px;
+  text-align: center;
 }
 
 .mic .listening {
