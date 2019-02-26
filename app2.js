@@ -15,6 +15,21 @@ function isChrome() {
   }
 }
 
+// https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+function uuid() {
+    function randomDigit() {
+        if (crypto && crypto.getRandomValues) {
+            var rands = new Uint8Array(1);
+            crypto.getRandomValues(rands);
+            return (rands[0] % 16).toString(16);
+        } else {
+            return ((Math.random() * 16) | 0).toString(16);
+        }
+    }
+    var crypto = window.crypto || window.msCrypto;
+    return 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, randomDigit);
+}
+
 function gotoListeningState() {
   const micListening = document.querySelector(".mic .listening");
   const micReady = document.querySelector(".mic .ready");
@@ -103,12 +118,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   // Now we’ve established that the browser is Chrome with proper speech API-s.
 
-  /*
-  // api.ai client
-  const apiClient = new ApiAi.ApiAiClient({accessToken: '329dcb8e2a8f4876acbf7fb616978686'});
 
   // Initial feedback message.
   addBotItem("Hi! I’m voicebot. Tap the microphone and start talking to me.");
+
+  var sessionId = uuid();
 
   var recognition = new webkitSpeechRecognition();
   var recognizedText = null;
@@ -122,18 +136,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
     addUserItem(recognizedText);
     ga('send', 'event', 'Message', 'add', 'user');
 
-    let promise = apiClient.textRequest(recognizedText);
 
-    promise
-        .then(handleResponse)
-        .catch(handleError);
+    gapi.client.request({
+      path: 'https://dialogflow.googleapis.com/v2/projects/jaanusbot-v2/agent/sessions/' + sessionId + ':detectIntent',
+      method: "POST",
+      body: {
+        "queryInput": {
+          "text": {
+            "text": recognizedText,
+            "languageCode": "en"
+          }
+        }
+      }
+    }).then(handleResponse, handleError);
 
     function handleResponse(serverResponse) {
 
       // Set a timer just in case. so if there was an error speaking or whatever, there will at least be a prompt to continue
       var timer = window.setTimeout(function() { startListening(); }, 5000);
 
-      const speech = serverResponse["result"]["fulfillment"]["speech"];
+      const speech = serverResponse["result"]["queryResult"]["fulfillmentText"];
       var msg = new SpeechSynthesisUtterance(speech);
       addBotItem(speech);
       ga('send', 'event', 'Message', 'add', 'bot');
@@ -149,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
       window.speechSynthesis.speak(msg);
     }
     function handleError(serverError) {
-      console.log("Error from api.ai server: ", serverError);
+      console.log("Error from DialogFlow server: ", serverError);
     }
   };
 
@@ -186,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         recognition.abort();
     }
   });
-  */
+
 
   // Google Authentication
 
