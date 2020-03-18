@@ -4,7 +4,7 @@ This is a simple web-based voicebot built against [api.ai](https://api.ai) backe
 
 ## Demo
 
-This is running at [voicebot.jaanus.com.](https://voicebot.jaanus.com)
+I used to provide an online functional demo version of this project, but this is no longer available. The API keys contained in the code are no longer working. The code remains available as an educational resource. To run it, you should replace the API keys with your own, and host it on your own.
 
 ## How to run
 
